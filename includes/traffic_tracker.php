@@ -13,6 +13,9 @@ function track_page_visit()
         session_start();
     }
 
+    // Generate or retrieve unique visitor ID using cookies
+    $visitor_id = get_or_create_visitor_id();
+
     // Get visitor information
     $page_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
     $visitor_ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
@@ -21,18 +24,56 @@ function track_page_visit()
 
     // Insert visit into database
     $stmt = $conn->prepare("
-        INSERT INTO site_traffic (page_url, visitor_ip, user_agent, session_id) 
-        VALUES (?, ?, ?, ?)
+        INSERT INTO site_traffic (page_url, visitor_ip, user_agent, session_id, visitor_id) 
+        VALUES (?, ?, ?, ?, ?)
     ");
 
     try {
-        $stmt->execute([$page_url, $visitor_ip, $user_agent, $session_id]);
+        $stmt->execute([$page_url, $visitor_ip, $user_agent, $session_id, $visitor_id]);
         return true;
     } catch (PDOException $e) {
         // Silent fail - don't disrupt user experience if tracking fails
         error_log('Traffic tracking error: ' . $e->getMessage());
         return false;
     }
+}
+
+// Function to get or create a unique visitor ID
+function get_or_create_visitor_id()
+{
+    $cookie_name = 'fvr_visitor_id';
+    $cookie_duration = 60 * 60 * 24 * 365; // 1 year in seconds
+
+    // Check if the cookie exists
+    if (isset($_COOKIE[$cookie_name])) {
+        return $_COOKIE[$cookie_name];
+    }
+
+    // Generate a new unique ID
+    $visitor_id = uniqid('v_', true);
+
+    // Set the cookie (secure if HTTPS is detected)
+    $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+    $http_only = true; // Better security
+    $same_site = 'Lax'; // Better security while allowing normal navigation
+
+    // Set the cookie with modern parameters
+    if (PHP_VERSION_ID >= 70300) {
+        // PHP 7.3.0 or higher - use the array options
+        setcookie($cookie_name, $visitor_id, [
+            'expires' => time() + $cookie_duration,
+            'path' => '/',
+            'domain' => '',
+            'secure' => $secure,
+            'httponly' => $http_only,
+            'samesite' => $same_site
+        ]);
+    } else {
+        // Older PHP versions
+        setcookie($cookie_name, $visitor_id, time() + $cookie_duration, '/');
+    }
+
+    return $visitor_id;
 }
 
 // Get traffic statistics
@@ -49,8 +90,16 @@ function get_traffic_stats()
         $stmt = $conn->query("SELECT COUNT(*) as total FROM site_traffic");
         $total_visits = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        // Unique visitors (by IP)
-        $stmt = $conn->query("SELECT COUNT(DISTINCT visitor_ip) as unique_visitors FROM site_traffic");
+        // Unique visitors (by visitor_id if available, fallback to IP)
+        $stmt = $conn->query("
+            SELECT COUNT(DISTINCT 
+                CASE 
+                    WHEN visitor_id IS NOT NULL AND visitor_id != '' THEN visitor_id 
+                    ELSE visitor_ip 
+                END
+            ) as unique_visitors 
+            FROM site_traffic
+        ");
         $unique_visitors = $stmt->fetch(PDO::FETCH_ASSOC)['unique_visitors'];
 
         // Visits today
@@ -58,7 +107,16 @@ function get_traffic_stats()
         $today_visits = $stmt->fetch(PDO::FETCH_ASSOC)['today'];
 
         // Unique visitors today
-        $stmt = $conn->query("SELECT COUNT(DISTINCT visitor_ip) as today_unique FROM site_traffic WHERE DATE(visit_time) = CURDATE()");
+        $stmt = $conn->query("
+            SELECT COUNT(DISTINCT 
+                CASE 
+                    WHEN visitor_id IS NOT NULL AND visitor_id != '' THEN visitor_id 
+                    ELSE visitor_ip 
+                END
+            ) as today_unique 
+            FROM site_traffic 
+            WHERE DATE(visit_time) = CURDATE()
+        ");
         $today_unique = $stmt->fetch(PDO::FETCH_ASSOC)['today_unique'];
 
         // Page popularity
