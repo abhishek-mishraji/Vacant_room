@@ -9,12 +9,6 @@
 4. Start PHP container (your existing Docker setup).
 5. Open: http://localhost:8081
 
-## Admin
-
-- Login: `login.php`
-- Default admin in DB (if inserted earlier): username `admin` with hashed password — if you used SHA2('admin123') then the password is `admin123`.
-- Use Admin Dashboard to update room statuses.
-
 ## Notes
 
 - Schedules table in DB expected to have day_of_week values: Mon, Tue, Wed, Thu, Fri.
