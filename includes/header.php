@@ -55,8 +55,12 @@ if (file_exists(__DIR__ . '/traffic_tracker.php')) {
         }
 
         @media (max-width: 768px) {
+
+            /* Removed the rule that hides the traffic-button */
             .traffic-button {
-                display: none;
+                margin-left: 5px;
+                padding: 4px 10px;
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -78,22 +82,24 @@ if (file_exists(__DIR__ . '/traffic_tracker.php')) {
                     <h1><a href="index.php">Find Vacant Room</a></h1>
                 </div>
 
-                <!-- Traffic Stats Button -->
-                <a href="traffic_stats.php" class="traffic-button">
-                    <svg class="traffic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 3v18h18"></path>
-                        <path d="M18 17V9"></path>
-                        <path d="M13 17V5"></path>
-                        <path d="M8 17v-3"></path>
-                    </svg>
-                    <span>Traffic Stats</span>
-                </a>
+
 
                 <button class="menu-toggle" aria-label="Toggle Menu">
                     <span class="menu-icon"></span>
                 </button>
             </div>
             <nav class="main-nav">
+                <!-- Traffic Stats Button -->
+                <a href="traffic_stats.php" class="traffic-button" width="25">
+                    <svg class="traffic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3v18h18"></path>
+                        <path d="M18 17V9"></path>
+                        <path d="M13 17V5"></path>
+                        <path d="M8 17v-3"></path>
+                    </svg>
+                    <span width="25">Traffic Stats</span>
+                </a>
                 <a href="index.php" class="nav-link">
                     <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
@@ -151,6 +157,16 @@ if (file_exists(__DIR__ . '/traffic_tracker.php')) {
     </header>
     <div class="mobile-menu-overlay">
         <nav class="mobile-menu">
+            <a href="traffic_stats.php" class="mobile-menu-link">
+                <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3v18h18"></path>
+                    <path d="M18 17V9"></path>
+                    <path d="M13 17V5"></path>
+                    <path d="M8 17v-3"></path>
+                </svg>
+                <span>Traffic Stats</span>
+            </a>
             <a href="index.php">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path

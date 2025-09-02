@@ -30,34 +30,34 @@ if ($cleardb_url) {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ];
 } else {
-    // Local database or other cloud database like Aiven
-    $db_host = getenv("DB_HOST") ?: "localhost";
-    $db_port = getenv("DB_PORT") ?: "3306";
-    $db_name = getenv("DB_NAME") ?: "find_vacant_room";
-    $db_user = getenv("DB_USER") ?: "root";
-    $db_pass = getenv("DB_PASS") ?: "";
-    $db_ssl = getenv("DB_SSL") ?: "false";
+    // Third-party MySQL database connection (Aiven)
+    $db_host = getenv("DB_HOST");
+    $db_port = getenv("DB_PORT");
+    $db_name = getenv("DB_NAME");
+    $db_user = getenv("DB_USER");
+    $db_pass = getenv("DB_PASS");
+    $db_ssl = getenv("DB_SSL") ?: "true";
+
+    // Verify we have required database credentials
+    if (!$db_host || !$db_port || !$db_name || !$db_user || !$db_pass) {
+        die("Error: Missing required database credentials in environment variables. Please check your .env file.");
+    }
 
     // For Aiven MySQL, we need to use TCP explicitly and ensure SSL cert is found
     $dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8";
-    if ($db_ssl === "true") {
-        // Ensure we're using absolute path to the certificate
-        $ca_cert_path = realpath(__DIR__ . '/ca.pem');
-        if (!$ca_cert_path) {
-            die("SSL Certificate not found at " . __DIR__ . '/ca.pem');
-        }
-        $options = [
-            PDO::MYSQL_ATTR_SSL_CA => $ca_cert_path,
-            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_TIMEOUT => 30
-        ];
-    } else {
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_TIMEOUT => 30
-        ];
+
+    // Always use SSL for third-party database connection
+    $ca_cert_path = realpath(__DIR__ . '/ca.pem');
+    if (!$ca_cert_path) {
+        die("SSL Certificate not found at " . __DIR__ . '/ca.pem');
     }
+
+    $options = [
+        PDO::MYSQL_ATTR_SSL_CA => $ca_cert_path,
+        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_TIMEOUT => 30
+    ];
 }
 
 // Create connection
@@ -73,10 +73,8 @@ try {
     echo "<br>DSN: " . $dsn;
     echo "<br>Host: " . ($cleardb_url ? $cleardb_server : $db_host);
     echo "<br>Port: " . ($cleardb_url ? $cleardb_port : $db_port);
-    echo "<br>SSL: " . ($db_ssl === "true" ? "Enabled" : "Disabled");
-    if ($db_ssl === "true") {
-        echo "<br>CA Cert Path: " . $ca_cert_path;
-        echo "<br>CA Cert exists: " . (file_exists($ca_cert_path) ? "Yes" : "No");
-    }
+    echo "<br>SSL: Enabled";
+    echo "<br>CA Cert Path: " . $ca_cert_path;
+    echo "<br>CA Cert exists: " . (file_exists($ca_cert_path) ? "Yes" : "No");
     die();
 }
