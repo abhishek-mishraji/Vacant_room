@@ -1,4 +1,21 @@
 <?php
+// Load environment variables from .env file if not already loaded
+$env_file = __DIR__ . '/.env';
+if (file_exists($env_file)) {
+    $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos($line, '#') === 0) {
+            continue;
+        }
+        list($name, $value) = explode('=', $line, 2);
+        $name = trim($name);
+        $value = trim($value);
+        if (!getenv($name)) {
+            putenv("$name=$value");
+        }
+    }
+}
+
 // Get Heroku ClearDB connection information or use local database
 $cleardb_url = getenv("CLEARDB_DATABASE_URL");
 if ($cleardb_url) {
@@ -21,21 +38,24 @@ if ($cleardb_url) {
     $db_pass = getenv("DB_PASS") ?: "";
     $db_ssl = getenv("DB_SSL") ?: "false";
 
-    $dsn = "mysql:";
-    $dsn .= "host=" . $db_host;
-    $dsn .= ";port=" . $db_port;
-    $dsn .= ";dbname=" . $db_name;
-    $dsn .= ";charset=utf8";
-
+    // For Aiven MySQL, we need to use TCP explicitly and ensure SSL cert is found
+    $dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8";
     if ($db_ssl === "true") {
-        $dsn .= ";sslmode=REQUIRED";
+        // Ensure we're using absolute path to the certificate
+        $ca_cert_path = realpath(__DIR__ . '/ca.pem');
+        if (!$ca_cert_path) {
+            die("SSL Certificate not found at " . __DIR__ . '/ca.pem');
+        }
         $options = [
-            PDO::MYSQL_ATTR_SSL_CA => __DIR__ . '/ca.pem', // Make sure ca.pem is present in config/
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            PDO::MYSQL_ATTR_SSL_CA => $ca_cert_path,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 30
         ];
     } else {
         $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 30
         ];
     }
 }
@@ -49,5 +69,14 @@ try {
     }
     // echo "Connected successfully";
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    echo "Database connection failed: " . $e->getMessage();
+    echo "<br>DSN: " . $dsn;
+    echo "<br>Host: " . ($cleardb_url ? $cleardb_server : $db_host);
+    echo "<br>Port: " . ($cleardb_url ? $cleardb_port : $db_port);
+    echo "<br>SSL: " . ($db_ssl === "true" ? "Enabled" : "Disabled");
+    if ($db_ssl === "true") {
+        echo "<br>CA Cert Path: " . $ca_cert_path;
+        echo "<br>CA Cert exists: " . (file_exists($ca_cert_path) ? "Yes" : "No");
+    }
+    die();
 }
