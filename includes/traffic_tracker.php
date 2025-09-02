@@ -86,58 +86,148 @@ function get_traffic_stats()
     }
 
     try {
-        // Total visits
-        $stmt = $conn->query("SELECT COUNT(*) as total FROM site_traffic");
-        $total_visits = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        // Check if summary tables exist
+        $stmt = $conn->query("SHOW TABLES LIKE 'traffic_daily_summary'");
+        $summary_tables_exist = $stmt->rowCount() > 0;
 
-        // Unique visitors (by visitor_id if available, fallback to IP)
-        $stmt = $conn->query("
-            SELECT COUNT(DISTINCT 
-                CASE 
-                    WHEN visitor_id IS NOT NULL AND visitor_id != '' THEN visitor_id 
-                    ELSE visitor_ip 
-                END
-            ) as unique_visitors 
-            FROM site_traffic
-        ");
-        $unique_visitors = $stmt->fetch(PDO::FETCH_ASSOC)['unique_visitors'];
+        if ($summary_tables_exist) {
+            // Use hybrid approach - raw data for today, summary tables for historical data
 
-        // Visits today
-        $stmt = $conn->query("SELECT COUNT(*) as today FROM site_traffic WHERE DATE(visit_time) = CURDATE()");
-        $today_visits = $stmt->fetch(PDO::FETCH_ASSOC)['today'];
+            // Total visits (combine today's raw data with historical summaries)
+            $stmt = $conn->query("
+                SELECT 
+                    (SELECT COUNT(*) FROM site_traffic WHERE DATE(visit_time) = CURDATE()) +
+                    IFNULL((SELECT SUM(total_visits) FROM traffic_daily_summary), 0) as total
+            ");
+            $total_visits = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        // Unique visitors today
-        $stmt = $conn->query("
-            SELECT COUNT(DISTINCT 
-                CASE 
-                    WHEN visitor_id IS NOT NULL AND visitor_id != '' THEN visitor_id 
-                    ELSE visitor_ip 
-                END
-            ) as today_unique 
-            FROM site_traffic 
-            WHERE DATE(visit_time) = CURDATE()
-        ");
-        $today_unique = $stmt->fetch(PDO::FETCH_ASSOC)['today_unique'];
+            // Unique visitors calculation is complex with aggregated data
+            // We'll use raw data for today and summary data for history
+            // Note: This is an approximation as we can't deduplicate across days in summary tables
+            $stmt = $conn->query("
+                SELECT 
+                    (SELECT COUNT(DISTINCT 
+                        CASE WHEN visitor_id IS NOT NULL AND visitor_id != '' 
+                            THEN visitor_id ELSE visitor_ip END
+                    ) FROM site_traffic WHERE DATE(visit_time) = CURDATE()) +
+                    IFNULL((SELECT SUM(unique_visitors) FROM traffic_daily_summary), 0) as unique_total
+            ");
+            $unique_visitors = $stmt->fetch(PDO::FETCH_ASSOC)['unique_total'];
 
-        // Page popularity
-        $stmt = $conn->query("
-            SELECT page_url, COUNT(*) as visits 
-            FROM site_traffic 
-            GROUP BY page_url 
-            ORDER BY visits DESC 
-            LIMIT 5
-        ");
-        $popular_pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // Today's metrics - use raw data
+            $stmt = $conn->query("
+                SELECT COUNT(*) as today 
+                FROM site_traffic 
+                WHERE DATE(visit_time) = CURDATE()
+            ");
+            $today_visits = $stmt->fetch(PDO::FETCH_ASSOC)['today'];
 
-        // Visits per day (last 7 days)
-        $stmt = $conn->query("
-            SELECT DATE(visit_time) as date, COUNT(*) as visits 
-            FROM site_traffic 
-            WHERE visit_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-            GROUP BY DATE(visit_time) 
-            ORDER BY date DESC
-        ");
-        $daily_visits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $conn->query("
+                SELECT COUNT(DISTINCT 
+                    CASE WHEN visitor_id IS NOT NULL AND visitor_id != '' 
+                        THEN visitor_id ELSE visitor_ip END
+                ) as today_unique 
+                FROM site_traffic 
+                WHERE DATE(visit_time) = CURDATE()
+            ");
+            $today_unique = $stmt->fetch(PDO::FETCH_ASSOC)['today_unique'];
+
+            // Popular pages - combine today's raw data with historical summaries
+            $stmt = $conn->query("
+                SELECT page_url, SUM(visits) as visits
+                FROM (
+                    SELECT page_url, COUNT(*) as visits
+                    FROM site_traffic
+                    WHERE DATE(visit_time) = CURDATE()
+                    GROUP BY page_url
+                    
+                    UNION ALL
+                    
+                    SELECT page_url, SUM(visit_count) as visits
+                    FROM traffic_page_summary
+                    GROUP BY page_url
+                ) combined_data
+                GROUP BY page_url
+                ORDER BY visits DESC
+                LIMIT 5
+            ");
+            $popular_pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Daily visits for the last 7 days - combine today's raw data with historical summaries
+            $stmt = $conn->query("
+                SELECT visit_date as date, visits
+                FROM (
+                    SELECT CURDATE() as visit_date, COUNT(*) as visits
+                    FROM site_traffic
+                    WHERE DATE(visit_time) = CURDATE()
+                    
+                    UNION ALL
+                    
+                    SELECT summary_date as visit_date, total_visits as visits
+                    FROM traffic_daily_summary
+                    WHERE summary_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                      AND summary_date < CURDATE()
+                ) combined_data
+                ORDER BY visit_date DESC
+                LIMIT 7
+            ");
+            $daily_visits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            // Fall back to original queries if summary tables don't exist
+
+            // Total visits
+            $stmt = $conn->query("SELECT COUNT(*) as total FROM site_traffic");
+            $total_visits = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+            // Unique visitors (by visitor_id if available, fallback to IP)
+            $stmt = $conn->query("
+                SELECT COUNT(DISTINCT 
+                    CASE 
+                        WHEN visitor_id IS NOT NULL AND visitor_id != '' THEN visitor_id 
+                        ELSE visitor_ip 
+                    END
+                ) as unique_visitors 
+                FROM site_traffic
+            ");
+            $unique_visitors = $stmt->fetch(PDO::FETCH_ASSOC)['unique_visitors'];
+
+            // Visits today
+            $stmt = $conn->query("SELECT COUNT(*) as today FROM site_traffic WHERE DATE(visit_time) = CURDATE()");
+            $today_visits = $stmt->fetch(PDO::FETCH_ASSOC)['today'];
+
+            // Unique visitors today
+            $stmt = $conn->query("
+                SELECT COUNT(DISTINCT 
+                    CASE 
+                        WHEN visitor_id IS NOT NULL AND visitor_id != '' THEN visitor_id 
+                        ELSE visitor_ip 
+                    END
+                ) as today_unique 
+                FROM site_traffic 
+                WHERE DATE(visit_time) = CURDATE()
+            ");
+            $today_unique = $stmt->fetch(PDO::FETCH_ASSOC)['today_unique'];
+
+            // Page popularity
+            $stmt = $conn->query("
+                SELECT page_url, COUNT(*) as visits 
+                FROM site_traffic 
+                GROUP BY page_url 
+                ORDER BY visits DESC 
+                LIMIT 5
+            ");
+            $popular_pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Visits per day (last 7 days)
+            $stmt = $conn->query("
+                SELECT DATE(visit_time) as date, COUNT(*) as visits 
+                FROM site_traffic 
+                WHERE visit_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                GROUP BY DATE(visit_time) 
+                ORDER BY date DESC
+            ");
+            $daily_visits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
 
         return [
             'total_visits' => $total_visits,
