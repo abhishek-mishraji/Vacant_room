@@ -1,0 +1,3 @@
+<?php
+// Navigation bar
+// ...existing code...

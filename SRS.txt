@@ -1,0 +1,114 @@
+Software Requirements Specification (SRS)
+
+Project: Find the Vacant Room Portal
+Version: 1.2 (Updated – No Floor Selection)
+Technology: HTML, CSS, PHP, MySQL
+Date: 1 Sept 2025
+
+1. Introduction
+1.1 Purpose
+
+This SRS defines requirements for the Find the Vacant Room Portal.
+The system will:
+
+Allow normal users (students/guests) to view room status by selecting only a building.
+
+Allow admins to log in and update room occupancy status.
+
+1.2 Scope
+
+Each building has 10 floors (0–9), 10 rooms per floor → 100 rooms per building.
+
+Class hours are 9 AM – 5 PM, divided into 8 one-hour slots.
+
+Normal users: No login, select a building → view all rooms with status.
+
+Admin: Login → update room status (Vacant/Occupied).
+
+2. Overall Description
+2.1 Product Perspective
+
+Web-based system using PHP & MySQL backend.
+
+User interface with HTML + CSS.
+
+No floor selection: building selection directly shows all 100 rooms.
+
+2.2 User Classes
+
+Normal User (Student/Guest):
+
+No login required.
+
+Can view status of all rooms in a selected building.
+
+Can filter by day & time slot.
+
+Admin:
+
+Must log in.
+
+Can update occupancy status for rooms.
+
+3. Functional Requirements
+For Normal Users (No Login)
+
+FR-01: View list of buildings.
+
+FR-02: Select a building → see all 100 rooms in that building with current status.
+
+FR-03: Filter by day (Mon–Sun) and time slot (9–10 … 16–17).
+
+FR-04: Status shown visually (Green=Vacant, Red=Occupied).
+
+For Admin (Login Required)
+
+FR-05: Admin login with username & password.
+
+FR-06: Update room status (Vacant/Occupied) for a specific building, room, day & time slot.
+
+FR-07: Save changes → updated instantly in user view.
+
+FR-08: Logout securely.
+
+4. Database Design (No Change Needed)
+
+Still uses:
+
+Buildings
+
+Rooms (with floor info but users won’t manually select floor)
+
+Schedules (status per room/day/slot)
+
+Users (admin login)
+
+5. System Features
+
+Normal User Flow:
+
+Open website → list of buildings.
+
+Select building → see grid/table of all 100 rooms (10 floors × 10 rooms) with statuses.
+
+Change day/time slot to refresh status.
+
+Admin Flow:
+
+Login.
+
+Select building → select room → update day & slot status.
+
+Save changes → reflected to all users.
+
+6. Acceptance Criteria
+
+AC-01: No floor selection step for users — building selection directly shows all 100 rooms.
+
+AC-02: Normal users can view statuses without login.
+
+AC-03: Admin login required for updates.
+
+AC-04: Admin updates reflect immediately on user interface.
+
+AC-05: Duplicate schedule entries prevented.

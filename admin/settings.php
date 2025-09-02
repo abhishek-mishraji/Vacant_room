@@ -1,0 +1,3 @@
+<?php
+// Optional admin settings
+// ...existing code...

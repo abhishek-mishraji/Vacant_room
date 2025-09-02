@@ -1,0 +1,55 @@
+Problem Statement (Final Version)
+
+Our university has 60 academic buildings, each containing 10 floors (0–9).
+Every floor has 10 rooms (numbered 01–10).
+Thus, each building has 100 rooms, and across the university there are 6000 rooms in total.
+
+The room numbering format is:
+
+Floor 0 → 001 to 010
+
+Floor 1 → 101 to 110
+
+…
+
+Floor 9 → 901 to 910
+
+Example:
+
+Building 5, Room 407 → means Building 5, Floor 4, Room 07.
+
+⚠️ The Problem
+
+Classes in the university are scheduled between 9:00 AM and 5:00 PM.
+
+During this time, classrooms may be occupied by lectures, labs, or events, or they may be vacant.
+
+Currently, there is no centralized system for students to check which rooms are vacant at a particular time.
+
+Students waste time physically searching multiple buildings and floors to find an available room for study, group work, or practice.
+
+The lack of a structured system also causes inefficient utilization of available space.
+
+💡 The Need
+
+A digital platform is required that allows:
+
+Students to instantly check room availability in any building during the class hours (9 AM – 5 PM).
+
+Search and filter by building, floor, room, day, and specific time slot.
+
+Provide a clear visual overview of which rooms are vacant or occupied.
+
+Help administration in monitoring room utilization trends.
+
+🎯 The Goal
+
+The goal is to build a web-based portal using PHP and MySQL that:
+
+Displays the real-time status (Vacant ✅ / Occupied ❌) of all 6000 rooms across 60 buildings.
+
+Handles time slots between 9 AM and 5 PM, showing room availability hour by hour.
+
+Allows easy searching, filtering, and navigation by building, floor, and room number.
+
+Improves student convenience and ensures better usage of university infrastructure.

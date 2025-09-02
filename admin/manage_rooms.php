@@ -1,0 +1,3 @@
+<?php
+// Page for managing rooms/schedules
+// ...existing code...

@@ -1,0 +1,463 @@
+/* Enhanced Base Styling */
+:root {
+    --primary-color: #007bff;
+    --primary-dark: #0056b3;
+    --primary-light: #b3d1ff;
+    --primary-lighter: #e3f0ff;
+    --success: #2ecc71;
+    --success-dark: #27ae60;
+    --danger: #e74c3c;
+    --danger-dark: #c0392b;
+    --text-color: #333;
+    --text-light: #666;
+    --background: #f7f7f9;
+    --header-bg: #222;
+    --header-text: #fff;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 18px rgba(0,123,255,0.08);
+    --box-shadow-hover: 0 8px 28px rgba(0,123,255,0.15);
+    --transition: all 0.3s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body { 
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif; 
+    margin: 0; 
+    background: var(--background); 
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 20px;
+    width: 100%;
+}
+
+/* Enhanced Header */
+.site-header { 
+    background: var(--header-bg); 
+    color: var(--header-text);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.site-header .container { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 12px 20px;
+}
+
+.site-header h1 { 
+    margin: 0; 
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.site-header h1 a {
+    color: var(--header-text);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.site-header h1 a:hover {
+    color: var(--primary-light);
+}
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.main-nav a { 
+    color: var(--header-text); 
+    text-decoration: none; 
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.main-nav a:hover { 
+    background: rgba(255,255,255,0.1);
+}
+
+/* Enhanced Footer */
+.site-footer { 
+    text-align: center; 
+    padding: 20px; 
+    margin-top: 40px; 
+    color: var(--text-light);
+    border-top: 1px solid rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(10px);
+}
+
+/* Simple form styles */
+.form label, .inline-form label { 
+    display: inline-block; 
+    margin-right: 12px;
+    font-weight: 600;
+}
+
+.form input, .form select { 
+    display: block; 
+    padding: 10px 12px; 
+    margin-top: 6px; 
+    width: 260px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: var(--transition);
+}
+
+.form input:focus, .form select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+}
+
+.form button, .inline-form button { 
+    padding: 10px 16px; 
+    margin-top: 10px; 
+    cursor: pointer;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.form button:hover, .inline-form button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* Grid for rooms used by both public building view and admin */
+.rooms { 
+    display: grid; 
+    grid-template-columns: repeat(10, 1fr); 
+    gap: 16px;
+}
+
+.room { 
+    padding: 16px; 
+    border-radius: var(--border-radius); 
+    color: #fff; 
+    text-align: center; 
+    font-weight: 700;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: var(--transition);
+}
+
+.room:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.room.vacant { 
+    background: var(--success);
+}
+
+.room.occupied { 
+    background: var(--danger);
+}
+
+/* Admin grids */
+.rooms-grid { 
+    display: grid; 
+    grid-template-columns: repeat(10, 1fr); 
+    gap: 16px; 
+    margin-bottom: 24px;
+}
+
+.room-box { 
+    padding: 16px; 
+    border-radius: var(--border-radius); 
+    color: #fff; 
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: var(--transition);
+}
+
+.room-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.room-box .room-code { 
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.room-box .room-status { 
+    font-size: 14px; 
+    opacity: 0.9; 
+    margin-bottom: 8px;
+}
+
+/* Overwrite colors for admin specific classes */
+.room-box.vacant { 
+    background: var(--success-dark);
+}
+
+.room-box.occupied { 
+    background: var(--danger-dark);
+}
+
+/* Minor */
+.inline-update select { 
+    margin-bottom: 8px;
+}
+
+.alert { 
+    padding: 12px; 
+    border-radius: 8px; 
+    margin-bottom: 16px;
+}
+
+.alert.error { 
+    background: #ffdddd; 
+    color: #900; 
+    border: 1px solid #f5c6cb;
+}
+
+/* Building Cards (from existing CSS, enhanced) */
+.building-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8faff 70%, #e3f0ff 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0,123,255,0.08);
+    padding: 32px 18px 24px 18px;
+    text-decoration: none;
+    transition: transform 0.18s, box-shadow 0.18s, background 0.3s;
+    border: 1px solid #e3eafc;
+    position: relative;
+    overflow: hidden;
+}
+.building-card::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    left: -40%;
+    width: 180%;
+    height: 180%;
+    background: radial-gradient(circle at 60% 40%, #b3d1ff33 0%, transparent 70%);
+    z-index: 0;
+    transition: opacity 0.3s;
+    opacity: 0.7;
+}
+.building-card:hover {
+    transform: translateY(-8px) scale(1.04);
+    box-shadow: 0 12px 36px rgba(0,123,255,0.18);
+    border-color: #007bff;
+    background: linear-gradient(135deg, #e3f0ff 60%, #f8faff 100%);
+}
+.building-card:hover::before {
+    opacity: 1;
+}
+.building-icon {
+    margin-bottom: 18px;
+    z-index: 1;
+}
+.building-icon svg {
+    filter: drop-shadow(0 2px 6px #b3d1ff88);
+}
+.building-name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #007bff;
+    text-align: center;
+    letter-spacing: 0.5px;
+    z-index: 1;
+    margin-top: 2px;
+}
+
+/* Enhanced Building Selection (from existing CSS) */
+.enhanced-buildings {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 28px;
+    margin-top: 32px;
+}
+
+/* Login Form Styles (from existing CSS) */
+.form {
+    max-width: 400px;
+    margin: 32px auto;
+    padding: 32px 24px 24px 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.form label {
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 6px;
+}
+.form input[type="text"],
+.form input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    background: #f9f9f9;
+    transition: border-color 0.2s;
+}
+.form input[type="text"]:focus,
+.form input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+.form button[type="submit"] {
+    padding: 12px 0;
+    background: linear-gradient(90deg, #007bff 60%, #0056b3 100%);
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    font-size: 17px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+    transition: background 0.2s;
+}
+.form button[type="submit"]:hover {
+    background: linear-gradient(90deg, #0056b3 60%, #007bff 100%);
+}
+.alert.error {
+    background: #ffeaea;
+    color: #d8000c;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 18px;
+    font-size: 15px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+    .container {
+        max-width: 900px;
+        padding: 16px;
+    }
+    .rooms, .rooms-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .enhanced-buildings {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+    }
+    .building-card {
+        padding: 18px 8px 14px 8px;
+        border-radius: 12px;
+    }
+    .building-name {
+        font-size: 1.1rem;
+    }
+    
+    .container {
+        max-width: 100%;
+        padding: 12px;
+    }
+    .rooms, .rooms-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .enhanced-buildings {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+    }
+    .building-card {
+        padding: 10px 2px 8px 2px;
+        border-radius: 8px;
+    }
+    .building-icon svg {
+        width: 28px;
+        height: 28px;
+    }
+    .building-name {
+        font-size: 1rem;
+        margin-top: 0;
+    }
+    
+    .container {
+        padding: 8px;
+    }
+    .site-header .container {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 8px;
+    }
+    .site-header h1 {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    .main-nav {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+    .main-nav a {
+        font-size: 14px;
+        padding: 4px 8px;
+    }
+    .rooms, .rooms-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    .room, .room-box {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .form {
+        max-width: 98%;
+        padding: 18px 12px;
+        gap: 12px;
+    }
+    .form input[type="text"],
+    .form input[type="password"] {
+        font-size: 15px;
+        padding: 10px;
+    }
+    .form button[type="submit"] {
+        font-size: 15px;
+        padding: 10px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .rooms, .rooms-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    .room, .room-box {
+        padding: 8px;
+        font-size: 13px;
+    }
+}

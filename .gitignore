@@ -1,0 +1,4 @@
+# Ignore sensitive files if using Git
+.env
+*.pem
+vendor/
