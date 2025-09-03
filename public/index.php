@@ -97,23 +97,26 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="ad-label">Advertisement</div>
         <script type="text/javascript">
             atOptions = {
-                'key': 'e1f2b480bca0a38321f98c241ef40f19',
+                'key': '030063e5c66d9393c808140dc0139ae6',
                 'format': 'iframe',
                 'height': 60,
                 'width': 468,
                 'params': {}
             };
-            document.write('<scr' + 'ipt type="text/javascript" src="//www.highperformancedformats.com/' +
-                atOptions.key + '/invoke.js"></scr' + 'ipt>');
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/030063e5c66d9393c808140dc0139ae6/invoke.js">
         </script>
     </div>
 
     <!-- Smartlink as text link -->
     <div class="sponsored-link-container">
-        <a href="https://www.revenuecpmgate.com/ek1ksa68?key=63728b9e552639ff849828f2977ebf4c" target="_blank"
+        <a href="https://www.revenuecpmgate.com/r5r0fxnahu?key=fea4d1759a8a918329d0a21990408110" target="_blank"
             class="sponsored-link">
             Sponsored: Discover more resources
         </a>
+        <script async="async" data-cfasync="false"
+            src="//pl27564471.revenuecpmgate.com/cebb03e2bdf7649688c1775b5238562c/invoke.js"></script>
+        <div id="container-cebb03e2bdf7649688c1775b5238562c"></div>
     </div>
 </div>
 
